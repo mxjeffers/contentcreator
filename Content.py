@@ -1,6 +1,7 @@
 # Malcolm Jeffers
-#
+# DO args for cli input
 
+import argparse
 import csv
 import urllib.request
 from bs4 import BeautifulSoup
@@ -58,7 +59,15 @@ def csv_file_writer(content):
             writer.writerow(row)
 
 
+def get_input_file():
+    parser = argparse.ArgumentParser(description=('get filename'))
+    parser.add_argument("filename")
+    args = parser.parse_args()
+    return args
+
+
 if __name__ == "__main__":
-    # print(csv_opener())
+    args = get_input_file()
+    print(args.filename)
     test = [["Puppy", "Large", "THis is, a test2"]]
     csv_file_writer(test)
