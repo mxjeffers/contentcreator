@@ -30,7 +30,7 @@ def wikiscraper(search_list):
 
     for row in search_list:
         try:
-            content = urllib.request.urlopen('https://en.wikipedia.org/wiki/' + row[0])
+            content = urllib.request.urlopen('https://en.wikipedia.org/wiki/' + row[0].replace(" ","_"))
             read_content = content.read()
             soup = BeautifulSoup(read_content, 'html.parser')
             pAll = soup.find_all('p')
