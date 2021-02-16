@@ -1,7 +1,7 @@
 # Malcolm Jeffers
 # CS 361 W21
 
-from tkinter import *
+# from tkinter import *
 import argparse
 import csv
 import sys
@@ -76,9 +76,9 @@ def get_input_file():
     parser.add_argument("filename")
     return parser
 
-
+"""
 def GUI():
-    """Tkinter GUI"""
+    #Tkinter GUI
 
     def get_wiki_output():
         output.delete('1.0', END)
@@ -122,13 +122,13 @@ def GUI():
     Secondary_key.grid(row=2, column=1, sticky=W)
     output.grid(row=3, column=0, columnspan=4)
     root.mainloop()
-
+"""
 
 if __name__ == "__main__":
     # GUI section
     # If no system arguments on startup load GUI else try CLI
     if len(sys.argv) == 1:
-        GUI()
+        """GUI()"""
     else:
         parser = get_input_file()
         args = parser.parse_args()
