@@ -29,4 +29,4 @@ def index():
     return "Enter a get in the following format. http://127.0.0.1:8000/get/?pri=puppy&sec=dog"
 
 if __name__ == "__main__":
-    app.run(threaded=True)
+    app.run()
