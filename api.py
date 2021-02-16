@@ -1,7 +1,7 @@
 import flask
 from flask import Flask, request, jsonify
-import contentgenerator as cg
 
+from contentgenerator import wikiscraper
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
@@ -19,7 +19,7 @@ def respond():
     response = {"primary_keyword": primary_keyword, "secondary_keyword": secondary_keyword}
 
     search = [[primary_keyword, secondary_keyword]]
-    paragraph = cg.wikiscraper(search)
+    paragraph = wikiscraper(search)
 
     response["wiki"] = paragraph[0][2]
     return jsonify(response)
