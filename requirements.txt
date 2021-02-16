@@ -14,13 +14,6 @@ idna==2.10
 itsdangerous==1.1.0
 Jinja2==2.11.3
 Js2Py==0.70
-Kivy==2.0.0rc3
-kivy-deps.angle==0.2.0
-kivy-deps.glew==0.2.0
-kivy-deps.gstreamer==0.1.18
-kivy-deps.sdl2==0.2.0
-Kivy-examples==2.0.0rc3
-Kivy-Garden==0.1.4
 MarkupSafe==1.1.1
 numpy==1.19.5
 packaging==20.9
