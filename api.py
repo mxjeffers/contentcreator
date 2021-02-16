@@ -18,6 +18,10 @@ def respond():
         return "Error keyword missing"
     response = {"primary_keyword": primary_keyword, "secondary_keyword": secondary_keyword}
 
+    if primary_keyword.lower() == "new york":
+        primary_keyword = "New_York_(state)"
+    if primary_keyword.lower() == "georgia":
+        primary_keyword = "Georgia_(U.S._state)"
     search = [[primary_keyword, secondary_keyword]]
     paragraph = wikiscraper(search)
 
@@ -26,7 +30,7 @@ def respond():
 
 @app.route('/')
 def index():
-    return "Enter a get in the following format. http://127.0.0.1:8000/get/?pri=puppy&sec=dog"
+    return "Enter a get in the following format. https://contentgenerator261w21.herokuapp.com/get/?pri=puppy&sec=dog"
 
 if __name__ == "__main__":
     app.run()
