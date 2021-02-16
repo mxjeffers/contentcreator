@@ -33,4 +33,4 @@ tzlocal==2.1
 urllib3==1.25.10
 virtualenv==20.0.30
 Werkzeug==1.0.1
-wxPython==4.1.1
+
