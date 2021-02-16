@@ -26,7 +26,6 @@ numpy==1.19.5
 packaging==20.9
 Pillow==7.2.0
 pipwin==0.5.1
-PyAudio @ file:///C:/Users/mxjef/Documents/PyAudio-0.2.11-cp38-cp38-win_amd64.whl
 pygame==1.9.6
 Pygments==2.6.1
 pyjsparser==2.7.1
