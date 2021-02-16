@@ -30,6 +30,7 @@ def wikiscraper(search_list):
 
     for row in search_list:
         try:
+            # Strip input of spaces and replace with underscore
             content = urllib.request.urlopen('https://en.wikipedia.org/wiki/' + row[0].replace(" ","_"))
             read_content = content.read()
             soup = BeautifulSoup(read_content, 'html.parser')
@@ -73,10 +74,6 @@ def get_input_file():
     """ Parses the input file on startup"""
     parser = argparse.ArgumentParser(description='input.csv filename')
     parser.add_argument("filename")
-    # args = parser.parse_args()
-    # if args.filename != "input.csv":
-    #    print("Please enter input.csv file.")
-    #    exit()
     return parser
 
 
