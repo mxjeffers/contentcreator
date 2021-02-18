@@ -1,11 +1,16 @@
 # Malcolm Jeffers
 # CS 361 W21
 
-# from tkinter import *
+try:
+    from tkinter import *
+except:
+    pass
+
 import argparse
 import csv
 import sys
 import urllib.request
+from wikiexception import find_exception
 from bs4 import BeautifulSoup
 
 
@@ -31,7 +36,8 @@ def wikiscraper(search_list):
     for row in search_list:
         try:
             # Strip input of spaces and replace with underscore
-            content = urllib.request.urlopen('https://en.wikipedia.org/wiki/' + row[0].replace(" ","_"))
+            wikipage = find_exception(row[0])
+            content = urllib.request.urlopen('https://en.wikipedia.org/wiki/' + wikipage.replace(" ","_"))
             read_content = content.read()
             soup = BeautifulSoup(read_content, 'html.parser')
             pAll = soup.find_all('p')
@@ -76,7 +82,7 @@ def get_input_file():
     parser.add_argument("filename")
     return parser
 
-"""
+
 def GUI():
     #Tkinter GUI
 
@@ -122,13 +128,16 @@ def GUI():
     Secondary_key.grid(row=2, column=1, sticky=W)
     output.grid(row=3, column=0, columnspan=4)
     root.mainloop()
-"""
+
 
 if __name__ == "__main__":
     # GUI section
     # If no system arguments on startup load GUI else try CLI
     if len(sys.argv) == 1:
-        """GUI()"""
+        try:
+            GUI()
+        except:
+            pass
     else:
         parser = get_input_file()
         args = parser.parse_args()

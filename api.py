@@ -10,18 +10,15 @@ app = Flask(__name__)
 @app.route('/get/', methods=['GET'])
 def respond():
     """Send Get response"""
-    primary_keyword = request.args.get("pri")
-    secondary_keyword = request.args.get("sec")
+    primary_keyword = request.args.get("pri").replace("_"," ")
+    secondary_keyword = request.args.get("sec").replace("_"," ")
 
     # Handles error of primary and secondary keywords not included
     if not primary_keyword or not secondary_keyword:
         return "Error keyword missing"
     response = {"primary_keyword": primary_keyword, "secondary_keyword": secondary_keyword}
 
-    if primary_keyword.lower() == "new york":
-        primary_keyword = "New_York_(state)"
-    if primary_keyword.lower() == "georgia":
-        primary_keyword = "Georgia_(U.S._state)"
+
     search = [[primary_keyword, secondary_keyword]]
     paragraph = wikiscraper(search)
 
