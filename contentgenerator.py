@@ -1,6 +1,7 @@
 # Malcolm Jeffers
 # CS 361 W21
 
+# Try added to bypass Heroku. Heroku does not support tkinter
 try:
     from tkinter import *
 except:
