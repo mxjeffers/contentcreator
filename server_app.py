@@ -31,5 +31,5 @@ def index():
 
 
 if __name__ == "__main__":
-    # Start App, Use environment port or pore 5001
+    # Start App, Use environment port or port 5001
     app.run(port=(os.getenv('PORT') if os.getenv('PORT') else 5001))
