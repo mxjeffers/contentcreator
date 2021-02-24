@@ -70,6 +70,18 @@ states_names = {'Alabama': 'AL',
                 'Wisconsin': 'WI',
                 'Wyoming': 'WY'}
 
+# Source https://python-forum.io/Thread-list-of-US-states
+state_list = ["Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado",
+              "Connecticut", "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois",
+              "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland",
+              "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana",
+              "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico", "New York",
+              "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania",
+              "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah",
+              "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"]
+
+person_gen_states = {'AK', "AZ", "CA", "CO", "HI", "ID", "MT", "NM", "NV", "OR", "UT", "WA", "WY"}
+
 
 def Name_to_Abbreviation(state):
     """Converts a full state name to its two

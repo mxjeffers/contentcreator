@@ -2,6 +2,7 @@
 # CS 361 W21
 
 # Try added to bypass Heroku. Heroku does not support tkinter
+from flask import json
 
 try:
     from tkinter import *
@@ -13,9 +14,9 @@ import argparse
 import csv
 import sys
 import urllib.request
-from wikiexception import find_exception
+from Utilties.wikiexception import find_exception
 from bs4 import BeautifulSoup
-from US_States import *
+from Utilties.US_States import *
 
 
 def csv_opener(filename):
@@ -52,7 +53,7 @@ def wikiscraper(search_list):
 
 
 def keyword_matcher(soup, row):
-    """Finds matching keywords in a paragraph"""
+    """Finds matching keywords in a paragraph."""
     # Search through each paragraph and look for matching keywords.
     for paragraph in soup.find_all('p'):
         if row[0].lower() in paragraph.text.lower() and \
@@ -90,73 +91,114 @@ def get_input_file():
     return parser
 
 
+def get_random_address(state):
+    """Gets a random address from the person generator
+    microservice."""
+    if state in person_gen_states:
+        try:
+            address_result = urllib.request.urlopen('http://127.0.0.1:5002/')
+            return address_result
+        except:
+            return
+    else:
+        return "Selected state is not currently supported."
+    pass
+
+
+def get_population(state):
+    """Gets a population from the population generator
+    microservice."""
+    try:
+        pop_result = urllib.request.urlopen('http://127.0.0.1:5003/get?state=' + state + '&year=2019')
+        data = pop_result.read()
+        response = json.loads(data)
+        return response
+    except:
+        return
+
+
 def GUI():
     # Tkinter GUI
 
     def get_wiki_output():
-        output.delete('1.0', END)
+
         content = [[keyWord1.get(), keyWord2.get()]]
         results = wikiscraper(content)
-
         # Place results in output container
         output.insert(END, results[0][2])
         csv_file_writer(results)
+
+    def get_address_output(state):
+
+        rand_address = get_random_address(state)
+        rand_address = combo.get()  # Testing edit out
+        address_output.insert(END, rand_address)
+
+    def get_state_population(state):
+
+        pop_result = get_population(state)
+        population_output.insert(END, state + " " + pop_result["population"])
+
+    def clear_content():
+        population_output.delete('1.0', END)
+        address_output.delete('1.0', END)
+        output.delete('1.0', END)
+
+    def generate_content():
+        clear_content()
+        state_code = Name_to_Abbreviation(combo.get())
+        get_wiki_output()
+        if address_bool.get():
+            get_address_output(state_code)
+        if population_bool.get():
+            get_state_population(state_code)
 
     # Root is main window
     root = Tk()
     root.title("Content Generator")
     root.geometry("600x400")
+
     keyWord1 = StringVar()
     keyWord2 = StringVar()
 
-    # Primary Keyword
     Pri_label = Label(root, text='Primary Keyword')
     Primary_key = Entry(root, textvariable=keyWord1)
 
-    # Secondary Keyword
     Sec_label = Label(root, text='Secondary Keyword')
     Secondary_key = Entry(root, textvariable=keyWord2)
 
-    # Button
-    btn = Button(root, text='Generate Content', command=get_wiki_output)
+    btn = Button(root, text='Generate Content', command=generate_content)
     btn.grid(row=4, column=2, sticky=W)
 
-    # Output Box
     output_lbl = Label(root, text='Wikipedia Results')
     output = Text(root, width=75, height=6, wrap=WORD)
 
-    # Address Results
     address_result_lbl = Label(root, text='Created Random Address')
     address_output = Text(root, width=75, height=2, wrap=WORD)
-    
-    # Population Results
-    population_results_lbl = Label(root, text='Population of Selected State')
-    population_output = Text(root, width=25,height=1)
 
-    # Combo Box
+    population_results_lbl = Label(root, text='Population of Selected State in 2019')
+    population_output = Text(root, width=25, height=1)
+
     combo_lbl = Label(root, text='Select a State.')
     combo = Combobox(root)
-    combo['values'] = (1,2,3,4,5)
+    combo['values'] = state_list
     combo.current(0)
-    
-    # Check Box for address
+
     address_bool = BooleanVar()
     address_bool.set(True)
     address_chk = Checkbutton(root, text='Create a random address for a selected state',
                               var=address_bool)
 
-    # Check box for population
     population_bool = BooleanVar()
     population_bool.set(True)
     population_chk = Checkbutton(root, text='Get population of a selected State',
                                  var=population_bool)
 
-    # Instructions
     Inst_label = Label(root, text='Input a Primary and Secondary Keyword. '
                                   'Then press enter to generate results '
                                   'from Wikipedia.')
 
-    # GRID LOCATIONS
+    # GRID LOCATIONS for all items
     Inst_label.grid(row=0, columnspan=3, sticky=W)
     Pri_label.grid(row=1, column=0, sticky=W, pady=2)
     Primary_key.grid(row=1, column=1, pady=2, sticky=W)
@@ -168,32 +210,18 @@ def GUI():
     combo.grid(row=4, column=1, sticky=W)
     address_chk.grid(row=3, column=0, sticky=W)
     population_chk.grid(row=3, column=1, sticky=W)
-    address_result_lbl.grid(row=8,column=0,sticky=W)
-    address_output.grid(row=9,column=0,columnspan=3, sticky=W)
+    address_result_lbl.grid(row=8, column=0, sticky=W)
+    address_output.grid(row=9, column=0, columnspan=3, sticky=W)
     population_results_lbl.grid(row=10, column=0, sticky=W)
     population_output.grid(row=11, column=0, columnspan=1, sticky=W)
+
     root.mainloop()
-
-
-def get_random_address():
-    pass
-
-
-def get_population(state):
-    state_code = Name_to_Abbreviation(state)
-    try:
-        pop_result = urllib.request.urlopen('http://127.0.0.1:5003/')  # Needs get parameters
-        return pop_result  # Needs JSON converter?
-    except urllib.error.HTTPError:
-        return
 
 
 if __name__ == "__main__":
     # If no system arguments on startup load GUI else try CLI
     if len(sys.argv) == 1:
-
         GUI()
-
     else:
         cli_inputs = get_input_file()
         args = cli_inputs.parse_args()
