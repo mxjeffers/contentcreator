@@ -1,15 +1,10 @@
 # Malcolm Jeffers
 # CS 361 W21
 
-# Try added to bypass Heroku. Heroku does not support tkinter
+
 from flask import json
-
-try:
-    from tkinter import *
-    from tkinter.ttk import *
-except:
-    pass
-
+from tkinter import *
+from tkinter.ttk import *
 import argparse
 import csv
 import sys
@@ -63,8 +58,7 @@ def keyword_matcher(soup, row):
     try:  # Add a statement to the row if no results are found
         row[2]
     except IndexError:
-        row.append("Matching primary and secondary "
-                   "keywords not found.")
+        row.append('Matching primary and secondary keywords not found.')
     return row
 
 
@@ -98,7 +92,7 @@ def get_random_address(state):
         try:
             address_result = urllib.request.urlopen('http://127.0.0.1:5002/')
             return address_result
-        except:
+        except urllib.error.HTTPError:
             return
     else:
         return "Selected state is not currently supported."
@@ -113,15 +107,24 @@ def get_population(state):
         data = pop_result.read()
         response = json.loads(data)
         return response
-    except:
+    except urllib.error.HTTPError:
         return
 
 
-def GUI():
-    # Tkinter GUI
+def cli(csv_file):
+    """Process command line csv file."""
+    input_list = csv_opener(csv_file)
+    print("Searching for keyword pairs from input.csv")
+    input_list = wikiscraper(input_list)
+    csv_file_writer(input_list)
+    print("Search completed successfully. See output.csv for results.")
+
+
+def gui():
+    """GUI portion of the microservice."""
 
     def get_wiki_output():
-
+        """Output results for Wiki search."""
         content = [[keyWord1.get(), keyWord2.get()]]
         results = wikiscraper(content)
         # Place results in output container
@@ -129,22 +132,25 @@ def GUI():
         csv_file_writer(results)
 
     def get_address_output(state):
-
+        """Gets a random address from the person gen microservice."""
         rand_address = get_random_address(state)
         rand_address = combo.get()  # Testing edit out
         address_output.insert(END, rand_address)
 
     def get_state_population(state):
-
+        """Gets a states population from the population generator
+        microservice."""
         pop_result = get_population(state)
         population_output.insert(END, state + " " + pop_result["population"])
 
     def clear_content():
+        """Clears content from output cells."""
         population_output.delete('1.0', END)
         address_output.delete('1.0', END)
         output.delete('1.0', END)
 
     def generate_content():
+        """Generates content for wiki, address, and population."""
         clear_content()
         state_code = Name_to_Abbreviation(combo.get())
         get_wiki_output()
@@ -154,6 +160,7 @@ def GUI():
             get_state_population(state_code)
 
     # Root is main window
+
     root = Tk()
     root.title("Content Generator")
     root.geometry("600x400")
@@ -161,11 +168,11 @@ def GUI():
     keyWord1 = StringVar()
     keyWord2 = StringVar()
 
-    Pri_label = Label(root, text='Primary Keyword')
-    Primary_key = Entry(root, textvariable=keyWord1)
+    pri_label = Label(root, text='Primary Keyword')
+    primary_key = Entry(root, textvariable=keyWord1)
 
-    Sec_label = Label(root, text='Secondary Keyword')
-    Secondary_key = Entry(root, textvariable=keyWord2)
+    sec_label = Label(root, text='Secondary Keyword')
+    secondary_key = Entry(root, textvariable=keyWord2)
 
     btn = Button(root, text='Generate Content', command=generate_content)
     btn.grid(row=4, column=2, sticky=W)
@@ -194,45 +201,41 @@ def GUI():
     population_chk = Checkbutton(root, text='Get population of a selected State',
                                  var=population_bool)
 
-    Inst_label = Label(root, text='Input a Primary and Secondary Keyword. '
+    inst_label = Label(root, text='Input a Primary and Secondary Keyword. '
                                   'Then press enter to generate results '
                                   'from Wikipedia.')
 
     # GRID LOCATIONS for all items
-    Inst_label.grid(row=0, columnspan=3, sticky=W)
-    Pri_label.grid(row=1, column=0, sticky=W, pady=2)
-    Primary_key.grid(row=1, column=1, pady=2, sticky=W)
-    Sec_label.grid(row=2, column=0, sticky=W)
-    Secondary_key.grid(row=2, column=1, sticky=W)
-    output_lbl.grid(row=5, column=0, sticky=W)
-    output.grid(row=6, column=0, columnspan=3, sticky=W)
-    combo_lbl.grid(row=4, column=0, sticky=W)
-    combo.grid(row=4, column=1, sticky=W)
-    address_chk.grid(row=3, column=0, sticky=W)
-    population_chk.grid(row=3, column=1, sticky=W)
-    address_result_lbl.grid(row=8, column=0, sticky=W)
-    address_output.grid(row=9, column=0, columnspan=3, sticky=W)
-    population_results_lbl.grid(row=10, column=0, sticky=W)
-    population_output.grid(row=11, column=0, columnspan=1, sticky=W)
+    def grid_locations():
+        inst_label.grid(row=0, columnspan=3, sticky=W)
+        pri_label.grid(row=1, column=0, sticky=W, pady=2)
+        primary_key.grid(row=1, column=1, pady=2, sticky=W)
+        sec_label.grid(row=2, column=0, sticky=W)
+        secondary_key.grid(row=2, column=1, sticky=W)
+        output_lbl.grid(row=5, column=0, sticky=W)
+        output.grid(row=6, column=0, columnspan=3, sticky=W)
+        combo_lbl.grid(row=4, column=0, sticky=W)
+        combo.grid(row=4, column=1, sticky=W)
+        address_chk.grid(row=3, column=0, sticky=W)
+        population_chk.grid(row=3, column=1, sticky=W)
+        address_result_lbl.grid(row=8, column=0, sticky=W)
+        address_output.grid(row=9, column=0, columnspan=3, sticky=W)
+        population_results_lbl.grid(row=10, column=0, sticky=W)
+        population_output.grid(row=11, column=0, columnspan=1, sticky=W)
 
+    grid_locations()
     root.mainloop()
 
 
 if __name__ == "__main__":
     # If no system arguments on startup load GUI else try CLI
     if len(sys.argv) == 1:
-        GUI()
+        gui()
     else:
         cli_inputs = get_input_file()
         args = cli_inputs.parse_args()
-
         if args.filename != "input.csv":
             print("Please enter input.csv file.")
             exit()
         else:
-            # CLI section
-            input_list = csv_opener(args.filename)
-            print("Searching for keyword pairs from input.csv")
-            input_list = wikiscraper(input_list)
-            csv_file_writer(input_list)
-            print("Search completed successfully. See output.csv for results.")
+            cli(args.filename)
