@@ -107,8 +107,8 @@ def get_population(state):
         data = pop_result.read()
         response = json.loads(data)
         return response
-    except urllib.error.HTTPError:
-        return
+    except urllib.error.URLError:
+        return {"population":"Population not found"}
 
 
 def cli(csv_file):
