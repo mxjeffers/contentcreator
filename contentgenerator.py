@@ -90,8 +90,10 @@ def get_random_address(state):
     microservice."""
     if state in person_gen_states:
         try:
-            address_result = urllib.request.urlopen('http://127.0.0.1:5002/')
-            return address_result
+            address_result = urllib.request.urlopen('http://127.0.0.1:5002/get?state=' + state + '&number=1')
+            address_data = address_result.read()
+            address_response = json.loads(address_data)
+            return address_response
         except urllib.error.HTTPError:
             return
     else:
@@ -134,8 +136,7 @@ def gui():
     def get_address_output(state):
         """Gets a random address from the person gen microservice."""
         rand_address = get_random_address(state)
-        rand_address = combo.get()  # Testing edit out
-        address_output.insert(END, rand_address)
+        address_output.insert(END, rand_address['addresses'][0])
 
     def get_state_population(state):
         """Gets a states population from the population generator
