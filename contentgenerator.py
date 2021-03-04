@@ -97,7 +97,7 @@ def get_random_address(state):
         except urllib.error.HTTPError:
             return
     else:
-        return "Selected state is not currently supported."
+        return {"addresses":["Selected state is not currently supported."]}
     pass
 
 
@@ -228,10 +228,137 @@ def gui():
     root.mainloop()
 
 
+class Controller:
+    def __init__(self):
+        self.root = Tk()
+        self.model = Model(self.root, self)
+        self.view = View(self.root, self, self.model)
+        self.root.title("Content Generator")
+        self.root.geometry("600x400")
+        self.root.mainloop()
+
+
+class Model:
+    def __init__(self, main, controller):
+        self.main = main
+        self.cont = controller
+        self.keyWord1 = StringVar()
+        self.keyword2 = StringVar()
+        self.address_bool = BooleanVar(self.main, True)
+        self.population_bool = BooleanVar(self.main, True)
+
+    def get_wiki_output(self, pri_keyword, sec_keyword):
+        content = [[pri_keyword.get(), sec_keyword.get()]]
+        results = wikiscraper(content)
+        self.cont.view.output.insert(END, results[0][2])
+        csv_file_writer(results)
+
+    def generate_content(self):
+        """Generates content for wiki, address, and population."""
+        self.clear_content()
+        state_code = Name_to_Abbreviation(self.cont.view.state_box.get())
+        self.get_wiki_output(self.keyWord1,self.keyword2)
+        if self.address_bool.get():
+            self.get_address_output(state_code)
+        if self.population_bool.get():
+            self.get_state_population(state_code)
+
+    def get_address_output(self,state):
+        """Gets a random address from the person gen microservice."""
+        rand_address = get_random_address(state)
+        self.cont.view.address_output.insert(END, rand_address['addresses'][0])
+
+    def get_state_population(self,state):
+        """Gets a states population from the population generator
+        microservice."""
+        pop_result = get_population(state)
+        self.cont.view.population_output.insert(END, state + " " + pop_result["population"])
+
+    def clear_content(self):
+        """Clears content from output cells."""
+        self.cont.view.population_output.delete('1.0', END)
+        self.cont.view.address_output.delete('1.0', END)
+        self.cont.view.output.delete('1.0', END)
+
+
+class View:
+    def __init__(self, main, controller, model):
+        self.controller = controller
+        self.model = model
+        self.frame = main
+        self.setup()
+
+    def setup(self):
+        self.create_widgets()
+
+    def create_widgets(self):
+        self.create_primary_widget()
+        self.create_secondary_widget()
+        self.create_instruction()
+        self.create_wiki_output()
+        self.create_state_select_box()
+        self.create_address_output()
+        self.create_population_output()
+        self.create_output_button()
+
+    def create_instruction(self):
+        self.inst_label = Label(self.frame, text='Input a Primary and Secondary Keyword. '
+                                                 'Then press enter to generate results '
+                                                 'from Wikipedia.')
+        self.inst_label.grid(row=0, columnspan=3, sticky=W)
+
+    def create_primary_widget(self):
+        self.pri_label = Label(self.frame, text='Primary Keyword')
+        self.primary_key = Entry(self.frame, textvariable=self.model.keyWord1)
+        self.pri_label.grid(row=1, column=0, sticky=W, pady=2)
+        self.primary_key.grid(row=1, column=1, pady=2, sticky=W)
+
+    def create_secondary_widget(self):
+        self.sec_label = Label(self.frame, text='Secondary Keyword')
+        self.secondary_key = Entry(self.frame, textvariable=self.model.keyword2)
+        self.sec_label.grid(row=2, column=0, sticky=W)
+        self.secondary_key.grid(row=2, column=1, sticky=W)
+
+    def create_wiki_output(self):
+        self.output_lbl = Label(self.frame, text='Wikipedia Results')
+        self.output_lbl.grid(row=5, column=0, sticky=W)
+        self.output = Text(self.frame, width=75, height=6, wrap=WORD)
+        self.output.grid(row=6, column=0, columnspan=3, sticky=W)
+
+    def create_state_select_box(self):
+        self.state_label = Label(self.frame, text='Select a State.') \
+            .grid(row=4, column=0, sticky=W)
+        self.state_box = Combobox(self.frame, values=state_list)
+        self.state_box.grid(row=4, column=1, sticky=W)
+        self.state_box.current(0)
+
+    def create_address_output(self):
+        self.address_chk = Checkbutton(self.frame, text='Create a random address for a selected state',
+                                       var=self.model.address_bool)
+        self.address_chk.grid(row=3, column=0, sticky=W)
+        self.address_result_lbl = Label(self.frame, text='Created Random Address') \
+            .grid(row=8, column=0, sticky=W)
+        self.address_output = Text(self.frame, width=75, height=2, wrap=WORD)
+        self.address_output.grid(row=9, column=0, columnspan=3, sticky=W)
+
+    def create_population_output(self):
+        self.population_chk = Checkbutton(self.frame, text='Get population of a selected State',
+                                          var=self.model.population_bool)
+        self.population_chk.grid(row=3, column=1, sticky=W)
+        self.population_results_lbl = Label(self.frame, text='Population of Selected State in 2019')
+        self.population_results_lbl.grid(row=10, column=0, sticky=W)
+        self.population_output = Text(self.frame, width=25, height=1)
+        self.population_output.grid(row=11, column=0, columnspan=1, sticky=W)
+
+    def create_output_button(self):
+        self.btn = Button(self.frame, text='Generate Content', command=self.model.generate_content) \
+            .grid(row=4, column=2, sticky=W)
+
+
 if __name__ == "__main__":
     # If no system arguments on startup load GUI else try CLI
     if len(sys.argv) == 1:
-        gui()
+        Controller()
     else:
         cli_inputs = get_input_file()
         args = cli_inputs.parse_args()
