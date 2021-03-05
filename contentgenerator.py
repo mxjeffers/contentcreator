@@ -191,6 +191,7 @@ class View:
         self.create_content_gen_widgets()
         self.create_pop_gen_widgets()
         self.create_person_gen_widgets()
+        self.create_menu()
 
     def create_content_gen_widgets(self):
         self.create_primary_widget()
@@ -259,6 +260,12 @@ class View:
         self.btn = Button(self.frame, text='Generate Content', command=self.model.generate_content) \
             .grid(row=4, column=2, sticky=W)
 
+    def create_menu(self):
+        self.menubar = Menu(self.frame)
+        file = Menu(self.menubar)
+        file.add_command(label="Exit", command=self.frame.destroy)
+        self.menubar.add_cascade(label="File", menu=file)
+        self.frame.config(menu=self.menubar)
 
 if __name__ == "__main__":
     # If no system arguments on startup load GUI else try CLI
