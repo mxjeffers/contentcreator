@@ -97,7 +97,7 @@ def get_random_address(state):
         except urllib.error.HTTPError:
             return
     else:
-        return {"addresses":["Selected state is not currently supported."]}
+        return {"addresses": ["Selected state is not currently supported."]}
     pass
 
 
@@ -122,113 +122,8 @@ def cli(csv_file):
     print("Search completed successfully. See output.csv for results.")
 
 
-def gui():
-    """GUI portion of the microservice."""
-
-    def get_wiki_output():
-        """Output results for Wiki search."""
-        content = [[keyWord1.get(), keyWord2.get()]]
-        results = wikiscraper(content)
-        # Place results in output container
-        output.insert(END, results[0][2])
-        csv_file_writer(results)
-
-    def get_address_output(state):
-        """Gets a random address from the person gen microservice."""
-        rand_address = get_random_address(state)
-        address_output.insert(END, rand_address['addresses'][0])
-
-    def get_state_population(state):
-        """Gets a states population from the population generator
-        microservice."""
-        pop_result = get_population(state)
-        population_output.insert(END, state + " " + pop_result["population"])
-
-    def clear_content():
-        """Clears content from output cells."""
-        population_output.delete('1.0', END)
-        address_output.delete('1.0', END)
-        output.delete('1.0', END)
-
-    def generate_content():
-        """Generates content for wiki, address, and population."""
-        clear_content()
-        state_code = Name_to_Abbreviation(combo.get())
-        get_wiki_output()
-        if address_bool.get():
-            get_address_output(state_code)
-        if population_bool.get():
-            get_state_population(state_code)
-
-    # Root is main window
-
-    root = Tk()
-    root.title("Content Generator")
-    root.geometry("600x400")
-
-    keyWord1 = StringVar()
-    keyWord2 = StringVar()
-
-    pri_label = Label(root, text='Primary Keyword')
-    primary_key = Entry(root, textvariable=keyWord1)
-
-    sec_label = Label(root, text='Secondary Keyword')
-    secondary_key = Entry(root, textvariable=keyWord2)
-
-    btn = Button(root, text='Generate Content', command=generate_content)
-    btn.grid(row=4, column=2, sticky=W)
-
-    output_lbl = Label(root, text='Wikipedia Results')
-    output = Text(root, width=75, height=6, wrap=WORD)
-
-    address_result_lbl = Label(root, text='Created Random Address')
-    address_output = Text(root, width=75, height=2, wrap=WORD)
-
-    population_results_lbl = Label(root, text='Population of Selected State in 2019')
-    population_output = Text(root, width=25, height=1)
-
-    combo_lbl = Label(root, text='Select a State.')
-    combo = Combobox(root)
-    combo['values'] = state_list
-    combo.current(0)
-
-    address_bool = BooleanVar()
-    address_bool.set(True)
-    address_chk = Checkbutton(root, text='Create a random address for a selected state',
-                              var=address_bool)
-
-    population_bool = BooleanVar()
-    population_bool.set(True)
-    population_chk = Checkbutton(root, text='Get population of a selected State',
-                                 var=population_bool)
-
-    inst_label = Label(root, text='Input a Primary and Secondary Keyword. '
-                                  'Then press enter to generate results '
-                                  'from Wikipedia.')
-
-    # GRID LOCATIONS for all items
-    def grid_locations():
-        inst_label.grid(row=0, columnspan=3, sticky=W)
-        pri_label.grid(row=1, column=0, sticky=W, pady=2)
-        primary_key.grid(row=1, column=1, pady=2, sticky=W)
-        sec_label.grid(row=2, column=0, sticky=W)
-        secondary_key.grid(row=2, column=1, sticky=W)
-        output_lbl.grid(row=5, column=0, sticky=W)
-        output.grid(row=6, column=0, columnspan=3, sticky=W)
-        combo_lbl.grid(row=4, column=0, sticky=W)
-        combo.grid(row=4, column=1, sticky=W)
-        address_chk.grid(row=3, column=0, sticky=W)
-        population_chk.grid(row=3, column=1, sticky=W)
-        address_result_lbl.grid(row=8, column=0, sticky=W)
-        address_output.grid(row=9, column=0, columnspan=3, sticky=W)
-        population_results_lbl.grid(row=10, column=0, sticky=W)
-        population_output.grid(row=11, column=0, columnspan=1, sticky=W)
-
-    grid_locations()
-    root.mainloop()
-
-
 class Controller:
+    """This class controls the GUI"""
     def __init__(self):
         self.root = Tk()
         self.model = Model(self.root, self)
@@ -239,6 +134,7 @@ class Controller:
 
 
 class Model:
+    """This class controls the functions in th GUI"""
     def __init__(self, main, controller):
         self.main = main
         self.cont = controller
@@ -248,6 +144,8 @@ class Model:
         self.population_bool = BooleanVar(self.main, True)
 
     def get_wiki_output(self, pri_keyword, sec_keyword):
+        """This function gets wikipedia results for the
+        primary and secondary keywords."""
         content = [[pri_keyword.get(), sec_keyword.get()]]
         results = wikiscraper(content)
         self.cont.view.output.insert(END, results[0][2])
@@ -257,18 +155,18 @@ class Model:
         """Generates content for wiki, address, and population."""
         self.clear_content()
         state_code = Name_to_Abbreviation(self.cont.view.state_box.get())
-        self.get_wiki_output(self.keyWord1,self.keyword2)
+        self.get_wiki_output(self.keyWord1, self.keyword2)
         if self.address_bool.get():
             self.get_address_output(state_code)
         if self.population_bool.get():
             self.get_state_population(state_code)
 
-    def get_address_output(self,state):
+    def get_address_output(self, state):
         """Gets a random address from the person gen microservice."""
         rand_address = get_random_address(state)
         self.cont.view.address_output.insert(END, rand_address['addresses'][0])
 
-    def get_state_population(self,state):
+    def get_state_population(self, state):
         """Gets a states population from the population generator
         microservice."""
         pop_result = get_population(state)
@@ -282,6 +180,7 @@ class Model:
 
 
 class View:
+    """Creates and places objects on the GUI"""
     def __init__(self, main, controller, model):
         self.controller = controller
         self.model = model
@@ -289,17 +188,23 @@ class View:
         self.setup()
 
     def setup(self):
-        self.create_widgets()
+        self.create_content_gen_widgets()
+        self.create_pop_gen_widgets()
+        self.create_person_gen_widgets()
 
-    def create_widgets(self):
+    def create_content_gen_widgets(self):
         self.create_primary_widget()
         self.create_secondary_widget()
         self.create_instruction()
         self.create_wiki_output()
-        self.create_state_select_box()
-        self.create_address_output()
+
+    def create_pop_gen_widgets(self):
         self.create_population_output()
         self.create_output_button()
+
+    def create_person_gen_widgets(self):
+        self.create_state_select_box()
+        self.create_address_output()
 
     def create_instruction(self):
         self.inst_label = Label(self.frame, text='Input a Primary and Secondary Keyword. '
@@ -363,7 +268,6 @@ if __name__ == "__main__":
         cli_inputs = get_input_file()
         args = cli_inputs.parse_args()
         if args.filename != "input.csv":
-            print("Please enter input.csv file.")
-            exit()
+            print("Please select an input.csv file.")
         else:
             cli(args.filename)
