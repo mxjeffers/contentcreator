@@ -1,6 +1,6 @@
 # Malcolm Jeffers
 # CS 361 W21
-
+import subprocess
 
 from flask import json
 from tkinter import *
@@ -124,6 +124,7 @@ def cli(csv_file):
 
 class Controller:
     """This class controls the GUI"""
+
     def __init__(self):
         self.root = Tk()
         self.model = Model(self.root, self)
@@ -135,6 +136,7 @@ class Controller:
 
 class Model:
     """This class controls the functions in th GUI"""
+
     def __init__(self, main, controller):
         self.main = main
         self.cont = controller
@@ -178,9 +180,14 @@ class Model:
         self.cont.view.address_output.delete('1.0', END)
         self.cont.view.output.delete('1.0', END)
 
+    def open_help(self):
+        """Opens documentation"""
+        subprocess.Popen("documentation.pdf", shell=True)
+
 
 class View:
     """Creates and places objects on the GUI"""
+
     def __init__(self, main, controller, model):
         self.controller = controller
         self.model = model
@@ -208,31 +215,31 @@ class View:
         self.create_address_output()
 
     def create_instruction(self):
-        self.inst_label = Label(self.frame, text='Input a Primary and Secondary Keyword. '
-                                                 'Then press enter to generate results '
-                                                 'from Wikipedia.')
-        self.inst_label.grid(row=0, columnspan=3, sticky=W)
+        inst_label = Label(self.frame, text='Input a Primary and Secondary Keyword. '
+                                            'Then press enter to generate results '
+                                            'from Wikipedia.')
+        inst_label.grid(row=0, columnspan=3, sticky=W)
 
     def create_primary_widget(self):
-        self.pri_label = Label(self.frame, text='Primary Keyword')
+        pri_label = Label(self.frame, text='Primary Keyword')
         self.primary_key = Entry(self.frame, textvariable=self.model.keyWord1)
-        self.pri_label.grid(row=1, column=0, sticky=W, pady=2)
+        pri_label.grid(row=1, column=0, sticky=W, pady=2)
         self.primary_key.grid(row=1, column=1, pady=2, sticky=W)
 
     def create_secondary_widget(self):
-        self.sec_label = Label(self.frame, text='Secondary Keyword')
+        sec_label = Label(self.frame, text='Secondary Keyword')
         self.secondary_key = Entry(self.frame, textvariable=self.model.keyword2)
-        self.sec_label.grid(row=2, column=0, sticky=W)
+        sec_label.grid(row=2, column=0, sticky=W)
         self.secondary_key.grid(row=2, column=1, sticky=W)
 
     def create_wiki_output(self):
-        self.output_lbl = Label(self.frame, text='Wikipedia Results')
-        self.output_lbl.grid(row=5, column=0, sticky=W)
+        output_lbl = Label(self.frame, text='Wikipedia Results')
+        output_lbl.grid(row=5, column=0, sticky=W)
         self.output = Text(self.frame, width=75, height=6, wrap=WORD)
         self.output.grid(row=6, column=0, columnspan=3, sticky=W)
 
     def create_state_select_box(self):
-        self.state_label = Label(self.frame, text='Select a State.') \
+        state_label = Label(self.frame, text='Select a State.') \
             .grid(row=4, column=0, sticky=W)
         self.state_box = Combobox(self.frame, values=state_list)
         self.state_box.grid(row=4, column=1, sticky=W)
@@ -242,17 +249,17 @@ class View:
         self.address_chk = Checkbutton(self.frame, text='Create a random address for a selected state',
                                        var=self.model.address_bool)
         self.address_chk.grid(row=3, column=0, sticky=W)
-        self.address_result_lbl = Label(self.frame, text='Created Random Address') \
+        address_result_lbl = Label(self.frame, text='Created Random Address') \
             .grid(row=8, column=0, sticky=W)
         self.address_output = Text(self.frame, width=75, height=2, wrap=WORD)
         self.address_output.grid(row=9, column=0, columnspan=3, sticky=W)
 
     def create_population_output(self):
-        self.population_chk = Checkbutton(self.frame, text='Get population of a selected State',
-                                          var=self.model.population_bool)
-        self.population_chk.grid(row=3, column=1, sticky=W)
-        self.population_results_lbl = Label(self.frame, text='Population of Selected State in 2019')
-        self.population_results_lbl.grid(row=10, column=0, sticky=W)
+        population_chk = Checkbutton(self.frame, text='Get population of a selected State',
+                                     var=self.model.population_bool)
+        population_chk.grid(row=3, column=1, sticky=W)
+        population_results_lbl = Label(self.frame, text='Population of Selected State in 2019')
+        population_results_lbl.grid(row=10, column=0, sticky=W)
         self.population_output = Text(self.frame, width=25, height=1)
         self.population_output.grid(row=11, column=0, columnspan=1, sticky=W)
 
@@ -261,11 +268,21 @@ class View:
             .grid(row=4, column=2, sticky=W)
 
     def create_menu(self):
-        self.menubar = Menu(self.frame)
-        file = Menu(self.menubar)
+        menubar = Menu(self.frame)
+        self.create_file_menu(menubar)
+        self.create_help_menu(menubar)
+        self.frame.config(menu=menubar)
+
+    def create_file_menu(self, menubar):
+        file = Menu(menubar, tearoff=False)
         file.add_command(label="Exit", command=self.frame.destroy)
-        self.menubar.add_cascade(label="File", menu=file)
-        self.frame.config(menu=self.menubar)
+        menubar.add_cascade(label="File", menu=file, underline=0)
+
+    def create_help_menu(self, menubar):
+        menu_help = Menu(menubar, tearoff=False)
+        menu_help.add_command(label="View Documentation", command=self.model.open_help)
+        menubar.add_cascade(label="Help", menu=menu_help, underline=0)
+
 
 if __name__ == "__main__":
     # If no system arguments on startup load GUI else try CLI
