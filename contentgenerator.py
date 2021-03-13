@@ -195,50 +195,59 @@ class View:
         self.setup()
 
     def setup(self):
+        """Setup Widgets and menu"""
         self.create_content_gen_widgets()
         self.create_pop_gen_widgets()
         self.create_person_gen_widgets()
         self.create_menu()
 
     def create_content_gen_widgets(self):
+        """Create widgets for content gen"""
         self.create_primary_widget()
         self.create_secondary_widget()
         self.create_instruction()
         self.create_wiki_output()
 
     def create_pop_gen_widgets(self):
+        """Create widgets for population gen"""
         self.create_population_output()
         self.create_output_button()
 
     def create_person_gen_widgets(self):
+        """create widgets for person gen"""
         self.create_state_select_box()
         self.create_address_output()
 
     def create_instruction(self):
+        """Creates the instructions"""
         inst_label = Label(self.frame, text='Input a Primary and Secondary Keyword. '
-                                            'Then press enter to generate results '
-                                            'from Wikipedia.')
+                                            'Then click Generate Content to get '
+                                            'results from Wikipedia.')
         inst_label.grid(row=0, columnspan=3, sticky=W)
 
     def create_primary_widget(self):
+        """Creates primary keyword widgets."""
         pri_label = Label(self.frame, text='Primary Keyword')
         self.primary_key = Entry(self.frame, textvariable=self.model.keyWord1)
         pri_label.grid(row=1, column=0, sticky=W, pady=2)
         self.primary_key.grid(row=1, column=1, pady=2, sticky=W)
 
     def create_secondary_widget(self):
+        """Creates secondary keyword widgets."""
         sec_label = Label(self.frame, text='Secondary Keyword')
         self.secondary_key = Entry(self.frame, textvariable=self.model.keyword2)
         sec_label.grid(row=2, column=0, sticky=W)
         self.secondary_key.grid(row=2, column=1, sticky=W)
 
     def create_wiki_output(self):
+        """Creates output box for wikipedia content."""
         output_lbl = Label(self.frame, text='Wikipedia Results')
         output_lbl.grid(row=5, column=0, sticky=W)
         self.output = Text(self.frame, width=75, height=6, wrap=WORD)
         self.output.grid(row=6, column=0, columnspan=3, sticky=W)
 
     def create_state_select_box(self):
+        """Create a select box with state names."""
         state_label = Label(self.frame, text='Select a State.') \
             .grid(row=4, column=0, sticky=W)
         self.state_box = Combobox(self.frame, values=state_list)
@@ -246,6 +255,7 @@ class View:
         self.state_box.current(0)
 
     def create_address_output(self):
+        """Create the random address output."""
         self.address_chk = Checkbutton(self.frame, text='Create a random address for a selected state',
                                        var=self.model.address_bool)
         self.address_chk.grid(row=3, column=0, sticky=W)
@@ -255,6 +265,7 @@ class View:
         self.address_output.grid(row=9, column=0, columnspan=3, sticky=W)
 
     def create_population_output(self):
+        """Create population output"""
         population_chk = Checkbutton(self.frame, text='Get population of a selected State',
                                      var=self.model.population_bool)
         population_chk.grid(row=3, column=1, sticky=W)
@@ -264,21 +275,25 @@ class View:
         self.population_output.grid(row=11, column=0, columnspan=1, sticky=W)
 
     def create_output_button(self):
+        """Create content generator button"""
         self.btn = Button(self.frame, text='Generate Content', command=self.model.generate_content) \
             .grid(row=4, column=2, sticky=W)
 
     def create_menu(self):
+        """Creates menus"""
         menubar = Menu(self.frame)
         self.create_file_menu(menubar)
         self.create_help_menu(menubar)
         self.frame.config(menu=menubar)
 
     def create_file_menu(self, menubar):
+        """Creates the file menu"""
         file = Menu(menubar, tearoff=False)
         file.add_command(label="Exit", command=self.frame.destroy)
         menubar.add_cascade(label="File", menu=file, underline=0)
 
     def create_help_menu(self, menubar):
+        """Creates the help menu"""
         menu_help = Menu(menubar, tearoff=False)
         menu_help.add_command(label="View Documentation", command=self.model.open_help)
         menubar.add_cascade(label="Help", menu=menu_help, underline=0)
