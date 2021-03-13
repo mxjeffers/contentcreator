@@ -182,7 +182,7 @@ class Model:
 
     def open_help(self):
         """Opens documentation"""
-        subprocess.Popen("documentation.pdf", shell=True)
+        subprocess.Popen("System Documentation.pdf", shell=True)
 
 
 class View:
